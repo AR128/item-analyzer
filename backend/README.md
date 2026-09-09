@@ -30,7 +30,7 @@ On Windows PowerShell, replace `cp` with `Copy-Item`. The local server listens o
 | `CORS_ALLOWED_ORIGINS` | Yes in production | Comma-separated browser origins allowed to call the API. Do not include a trailing slash. |
 
 ```env
-CORS_ALLOWED_ORIGINS=https://item-analyzer-three.vercel.app
+CORS_ALLOWED_ORIGINS=[https://item-analyzer-three.vercel.app](https://train-item-analyzer.vercel.app/)
 ```
 
 For a Vercel preview deployment, add its exact preview URL as another comma-separated value. Do not use `*` when the API is public.
