@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function CameraCapture({ onImageCapture, onClose }) {
   const videoRef = useRef(null);
@@ -7,43 +7,10 @@ export default function CameraCapture({ onImageCapture, onClose }) {
   const [error, setError] = useState("");
   const [cameraReady, setCameraReady] = useState(false);
   const [stream, setStream] = useState(null);
-
-  useEffect(() => {
-    const startCamera = async () => {
-      try {
-        console.log("Requesting camera access...");
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: false,
-        });
-
-        console.log("Camera access granted!");
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          setStream(mediaStream);
-          setCameraReady(true);
-          setError("");
-        }
-      } catch (error) {
-        console.error("Camera error:", error);
-        handleCameraError(error);
-      }
-    };
-
-    startCamera();
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, []);
-
+  const [facingMode, setFacingMode] = useState("environment");
+  
   const handleCameraError = (error) => {
-    let errorMsg = "Unable to access camera.";
+    let errorMsg;
 
     if (
       error.name === "PermissionDeniedError" ||
@@ -68,6 +35,44 @@ export default function CameraCapture({ onImageCapture, onClose }) {
 
     setError(errorMsg);
   };
+
+  useEffect(() => {
+    let currentStream = null;
+    const startCamera = async () => {
+      try {
+        console.log("Requesting camera access...");
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: facingMode,
+          },
+          audio: false,
+        });
+
+        console.log("Camera access granted!");
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          setStream(mediaStream);
+          currentStream = mediaStream;
+          setCameraReady(true);
+          setError("");
+        }
+      } catch (error) {
+        console.error("Camera error:", error);
+        handleCameraError(error);
+      }
+    };
+
+    startCamera();
+
+    return () => {
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [facingMode]);
+
 
   const capture = () => {
     if (videoRef.current && canvasRef.current) {
@@ -175,6 +180,14 @@ export default function CameraCapture({ onImageCapture, onClose }) {
               )}
             </div>
             <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => setFacingMode((prev) => prev === "user" ? "environment" : "user")}
+                disabled={!cameraReady}
+                className="rounded-xl bg-gray-200 px-5 py-3 font-semibold text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                title="Flip Camera"
+              >
+                🔄
+              </button>
               <button
                 onClick={capture}
                 disabled={!cameraReady}
