@@ -3,6 +3,10 @@ import ImageUploader from "../components/ImageUploader";
 import ResultCard from "../components/ResultCard";
 import CameraCapture from "../components/CameraCapture";
 
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "https://item-analyzer.onrender.com"
+).replace(/\/$/, "");
+
 function Home() {
   const [image, setImage] = useState(null);
   const [result, setResult] = useState(null);
@@ -18,7 +22,7 @@ function Home() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("https://item-analyzer.onrender.com/api/items/analyze", {
+      const response = await fetch(`${API_BASE_URL}/api/items/analyze`, {
         method: "POST",
         body: formData,
       });
