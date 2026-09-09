@@ -18,7 +18,7 @@ function Home() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:3000/api/items/analyze", {
+      const response = await fetch("https://item-analyzer-oanl.vercel.app/api/items/analyze", {
         method: "POST",
         body: formData,
       });
